@@ -216,7 +216,8 @@
     <div class="container">
         <div id="mobile_menu"><i class="fa fa-bars"></i></div>
         <a href="<?= $websiteUrl ?>/home" id="logo" title="<?= $websiteTitle ?>">
-            <img src="<?= $websiteLogo ?>" width="100%" height="auto" alt="<?= $websiteTitle ?>">
+            <img src="<?= $websiteLogo ?>" width="100%" height="auto" alt="<?= $websiteTitle ?> logo">
+            <span class="brand-tagline">Anime streaming reimagined</span>
             <div class="clearfix"></div>
         </a>
         <div id="search" class="">

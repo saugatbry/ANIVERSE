@@ -17,22 +17,29 @@ parse_str($parts[1] ?? '', $queryParams);
 $episodeId = $queryParams['ep'] ?? null;
 $animeData = fetchAnimeData($animeId);
 
-$episodelistUrl = "$zpi/episodes/$animeId";
+$episodelistUrl = "$zpi/episodes?id=" . urlencode($animeId) . "&season=1";
 $episodelistResponse = file_get_contents($episodelistUrl);
 $episodelistData = json_decode($episodelistResponse, true);
 
 $episodelist = [];
 
-if (
-    !empty($episodelistData['success']) &&
-    $episodelistData['success'] === true &&
-    !empty($episodelistData['results']['episodes'])
-) {
-    $episodelist = $episodelistData['results']['episodes'];
+if (!empty($episodelistData['success']) && $episodelistData['success'] === true) {
+    $rawEpisodes = $episodelistData['results']['episodes'] ?? [];
+    foreach ($rawEpisodes as $ep) {
+        $epNo = (int)($ep['episode_no'] ?? $ep['episode'] ?? 0);
+        if ($epNo <= 0) continue;
+        $episodelist[] = [
+            'id' => (string)$epNo,
+            'episode_no' => $epNo,
+            'jname' => $ep['title'] ?? ('Episode ' . $epNo),
+            'title' => $ep['title'] ?? ('Episode ' . $epNo),
+            'filler' => false,
+        ];
+    }
 }
 
 usort($episodelist, function ($a, $b) {
-    return $a['episode_no'] - $b['episode_no'];
+    return $a['episode_no'] <=> $b['episode_no'];
 });
 
 $totalEpisodes = count($episodelist);
@@ -908,7 +915,7 @@ $totalVotes = $like_count + $dislike_count;
                 const $iframe = $("#iframe-embed");
                 let currentServerType = localStorage.getItem('preferredServerType') || 'dub';
                 let currentServerName = localStorage.getItem('preferredServerName') || '';
-                let currentEpisodeId = '<?= htmlspecialchars($streaming) ?>';
+                let currentEpisodeId = String(new URLSearchParams(window.location.search).get("ep") || "1");
                 let animeId = '<?= htmlspecialchars($animeData['id']) ?>';
                 let autoNextEnabled = true;
                 let autoSkipEnabled = true;
@@ -975,9 +982,9 @@ $totalVotes = $like_count + $dislike_count;
                     }
                 }
 
-                async function fetchServers(episodeId) {
+                async function fetchServers(episodeNumber) {
                     try {
-                        const response = await fetch(`/src/ajax/server.php?episodeId=${episodeId}`);
+                        const response = await fetch(`/src/ajax/server.php?animeId=${encodeURIComponent(animeId)}&episode=${episodeNumber}&season=1`);
                         if (!response.ok) throw new Error('Network response was not ok');
                         return await response.json();
                     } catch (error) {
@@ -987,8 +994,8 @@ $totalVotes = $like_count + $dislike_count;
                 }
 
 
-                async function updateServerList(episodeId) {
-                    const servers = await fetchServers(episodeId);
+                async function updateServerList(episodeNumber) {
+                    const servers = await fetchServers(episodeNumber);
                     if (!servers) return;
                     const $subList = $('.ps_-block-sub .ps__-list');
                     const $dubList = $('.ps_-block-dub .ps__-list');
@@ -1006,7 +1013,7 @@ $totalVotes = $like_count + $dislike_count;
                             return `
                     <div class="item">
                         <button class="btn btn-server ${isActive ? 'active' : ''}" 
-                            data-episode-id="${episodeId}"
+                            data-episode-id="${episodeNumber}"
                             data-server-id="${server.serverId}"
                             data-server-type="sub"
                             data-server-name="${server.serverName}">
@@ -1027,7 +1034,7 @@ $totalVotes = $like_count + $dislike_count;
                             return `
                     <div class="item">
                         <button class="btn btn-server ${isActive ? 'active' : ''}"
-                            data-episode-id="${episodeId}"
+                            data-episode-id="${episodeNumber}"
                             data-server-id="${server.serverId}"
                             data-server-type="dub"
                             data-server-name="${server.serverName}">
@@ -1078,9 +1085,7 @@ $totalVotes = $like_count + $dislike_count;
                         const serverId = $(this).data("server-id");
                         const serverType = $(this).data("server-type");
                         const serverName = $(this).data("server-name");
-                        const episodeId = $(this).data("episode-id");
-                        const urlParams = new URLSearchParams(window.location.search);
-                        const episodeNumber = urlParams.get('ep');
+                        const episodeNumber = $(this).data("episode-id");
 
                         currentServerType = serverType;
                         currentServerName = serverName;
@@ -1089,8 +1094,8 @@ $totalVotes = $like_count + $dislike_count;
                         localStorage.setItem('preferredServerName', serverName);
 
                         const skipParam = autoSkipEnabled ? "&skip=true" : "&skip=false";
-                        const encodedId = encodeURIComponent(currentEpisodeId); // ✅ properly encode the ID
-                        const playerUrl = `<?= $websiteUrl ?>/src/player/${currentServerType}.php?id=${encodedId}&server=${currentServerName}&embed=true&ep=${episodeNumber}${skipParam}`;
+                        const encodedId = encodeURIComponent(animeId);
+                        const playerUrl = `<?= $websiteUrl ?>/src/player/${currentServerType}.php?id=${encodedId}&server=${encodeURIComponent(serverId)}&embed=true&ep=${episodeNumber}&season=1${skipParam}`;
 
                         console.log('Setting player URL:', playerUrl);
                         setTimeout(() => $iframe.attr('src', playerUrl), 100);
@@ -1100,7 +1105,7 @@ $totalVotes = $like_count + $dislike_count;
                         });
 
                         $(".pc-autoskip").off("click").on("click", function () {
-                            const reloadUrl = `<?= $websiteUrl ?>/src/player/${currentServerType}.php?id=${encodedId}&server=${currentServerName}&embed=true&ep=${episodeNumber}${skipParam}`;
+                            const reloadUrl = `<?= $websiteUrl ?>/src/player/${currentServerType}.php?id=${encodedId}&server=${encodeURIComponent(serverId)}&embed=true&ep=${episodeNumber}&season=1${skipParam}`;
                             console.log('Reloading player URL:', reloadUrl);
                             $iframe.attr('src', reloadUrl);
                         });
@@ -1134,9 +1139,8 @@ $totalVotes = $like_count + $dislike_count;
                 const $episodeItems = $(".ssl-item");
                 $episodeItems.each(function () {
                     $(this).on("click", async function () {
-                        const episodeId = $(this).attr("data-id");
                         const episodeNumber = $(this).attr("data-number");
-                        currentEpisodeId = episodeId;
+                        currentEpisodeId = episodeNumber;
 
                         $episodeItems.removeClass("active");
                         $(this).addClass("active");
@@ -1153,7 +1157,7 @@ $totalVotes = $like_count + $dislike_count;
                             episodeNumber: parseInt(episodeNumber)
                         });
 
-                        await updateServerList(episodeId);
+                        await updateServerList(episodeNumber);
 
                         updateNavigationButtons();
                     });

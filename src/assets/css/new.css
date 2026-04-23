@@ -278,3 +278,27 @@
     border-radius: 4px;
     color: white;
 }
+
+/* Ani Verse refresh */
+#logo img {
+  max-width: 220px;
+  filter: drop-shadow(0 8px 22px rgba(255, 92, 168, 0.35));
+}
+#logo .brand-tagline {
+  display: block;
+  margin-top: 4px;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #aeb7de;
+}
+body {
+  background: radial-gradient(circle at top, #252843 0%, #161822 45%, #11131b 100%);
+}
+#header {
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  backdrop-filter: blur(4px);
+}
+.block_area-header, .film_list-wrap, .anif-block-ul {
+  border-radius: 12px;
+}

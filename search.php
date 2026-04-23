@@ -18,14 +18,14 @@ $query = isset($_GET['keyword']) ? str_replace(' ', '-', $_GET['keyword']) : '';
 
 if ($query) {
 
-    $apiUrl = "$zpi/search?keyword={$query}&page={$page}";
+    $apiUrl = "$zpi/search?s={$query}&page={$page}";
 
     try {
         $response = file_get_contents($apiUrl);
         if ($response !== false) {
             $data = json_decode($response, true);
-            if ($data && isset($data['success']) && $data['success'] && isset($data['results']['data'])) {
-                $searchResults = $data['results']['data'];
+            if ($data && isset($data['success']) && $data['success']) {
+                $searchResults = $data['results']['data'] ?? $data['results']['results'] ?? [];
             } else {
                 $errorMessage = 'Failed to fetch search results. Please try again later.';
             }
