@@ -18,7 +18,7 @@ if (isset($_GET['keyword'])) {
         exit;
     }
 
-    $apiUrl = "$zpi/search?keyword=" . urlencode($keyword); // Use the full URL here
+    $apiUrl = "$zpi/search?s=" . urlencode($keyword); // Use the full URL here
 
     try {
         $ch = curl_init();

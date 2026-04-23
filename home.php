@@ -22,11 +22,12 @@ curl_close($ch);
 $data = json_decode($response, true);
 
 if (!$data || !$data['success']) {
-    echo "Muhehehe! API request failed and no cache available.";
-    exit;
+    $data = ['results' => []];
 }
 
-$data = $data['results'];
+$data = $data['results'] ?? [];
+$defaults = ['spotlights'=>[], 'trending'=>[], 'topAiring'=>[], 'mostPopular'=>[], 'mostFavorite'=>[], 'latestCompleted'=>[]];
+$data = array_merge($defaults, is_array($data) ? $data : []);
 ?>
 <!DOCTYPE html>
 <html prefix="og: http://ogp.me/ns#" xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
