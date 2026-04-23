@@ -32,7 +32,12 @@ if(isset($_POST['submit']) || isset($_POST['anilist_login'])){
               exit();
           } elseif(isset($_GET['redirect'])) {
               $redirectUrl = $_GET['redirect'];
-              header('location:'.$redirectUrl);
+              // only allow same-site relative redirects
+              if (is_string($redirectUrl) && preg_match('/^\/[A-Za-z0-9_\-\/?=&.%]*$/', $redirectUrl)) {
+                  header('location:' . $redirectUrl);
+              } else {
+                  header('location:../../home');
+              }
               exit();
           } else {
               header('location:../../home');

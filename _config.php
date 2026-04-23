@@ -24,6 +24,9 @@ $instagram = "https://www.instagram.com/pxr15_";
 
 // all the api you need
 $zpi = "https://anime-api-ashen-chi.vercel.app/api";
+if (strpos($zpi, 'your-hosted-api.com') !== false) {
+    $zpi = "https://anime-api-ashen-chi.vercel.app/api";
+}
 $proxy = ""; // Proxy disabled: use direct stream URLs
 
 //If you want faster loading speed just put // before the first proxy and remove slashes from this one 
