@@ -10,87 +10,68 @@
     </div>
 
     <div class="tab-content">
-        <div class="block_area-content block_area-list film_list film_list-grid film_list-wfeature ">
+        <div class="block_area-content block_area-list film_list film_list-grid film_list-wfeature">
             <div class="film_list-wrap">
                 <?php
-                // Fetch JSON data
-                $json = file_get_contents("$zpi/series?page=1");
-                $json = json_decode($json, true);
+                $payload = @file_get_contents("$zpi/series?page=1");
+                $json = $payload ? json_decode($payload, true) : [];
+                $rows = $json['results']['results'] ?? $json['results']['data'] ?? $json['results'] ?? [];
+                if (!is_array($rows)) $rows = [];
 
-                // Check if 'results' and 'data' exist
-                if (isset($json['results']) && is_array($json['results'])) {
-                    $animeList = $json['results']['data'] ?? $json['results'];
-                    if (isset($animeList['results']) && is_array($animeList['results'])) { $animeList = $animeList['results']; }
-                    $animeList = array_slice($animeList, 0, 12);
-                    foreach ($animeList as $anime) {
-                        $title = !empty($anime['title'] ?? 'Unknown') ? $anime['title'] ?? 'Unknown' : 'Unknown';
-                        $jname = !empty($anime['jname']) ? $anime['jname'] : $title;
+                $animeList = array_slice($rows, 0, 12);
+                foreach ($animeList as $anime):
+                    $animeId = $anime['id'] ?? $anime['anime_id'] ?? '';
+                    $title = $anime['title'] ?? 'Unknown';
+                    $jname = $anime['jname'] ?? $title;
+                    $tvInfo = $anime['tvInfo'] ?? [];
+                    $subCount = $tvInfo['sub'] ?? ($anime['episode'] ?? null);
+                    $dubCount = $tvInfo['dub'] ?? null;
                 ?>
                 <div class="flw-item">
                     <div class="film-poster">
-                        <!-- Age Indicator -->
-                        <?php if (!empty($anime['adultContent'])) { ?>
-                            <div class="tick ltr" style="position: absolute; top: 10px; left: 10px;">
+                        <?php if (!empty($anime['adultContent'])): ?>
+                            <div class="tick ltr" style="position:absolute;top:10px;left:10px;">
                                 <div class="tick-item tick-age amp-algn">18+</div>
                             </div>
-                        <?php } ?>
-                        <!-- Sub and Dub Counts -->
-                        <div class="tick ltr" style="position: absolute; bottom: 10px; left: 10px;">
-                            <?php
-                                $animeId = $anime['id'] ?? $anime['anime_id'] ?? '';
-                                $title = $anime['title'] ?? 'Unknown';
-                                $jname = $anime['jname'] ?? $title;
-                                $subCount = $anime['tvInfo']['sub'] ?? $anime['episode'] ?? null;
-                                $dubCount = $anime['tvInfo']['dub'] ?? null;
-                            ?>
+                        <?php endif; ?>
+
+                        <div class="tick ltr" style="position:absolute;bottom:10px;left:10px;">
                             <?php if (!empty($subCount)): ?>
-                                <div class="tick-item tick-sub amp-algn" style="text-align: left;">
+                                <div class="tick-item tick-sub amp-algn" style="text-align:left;">
                                     <i class="fas fa-closed-captioning"></i> <?= htmlspecialchars((string)$subCount) ?>
                                 </div>
                             <?php endif; ?>
                             <?php if (!empty($dubCount)): ?>
-                                <div class="tick-item tick-dub amp-algn" style="text-align: left;">
+                                <div class="tick-item tick-dub amp-algn" style="text-align:left;">
                                     <i class="fas fa-microphone"></i> <?= htmlspecialchars((string)$dubCount) ?>
                                 </div>
                             <?php endif; ?>
                         </div>
-                        <!-- Anime Poster -->
+
                         <img class="film-poster-img lazyload"
-                            data-src="<?= htmlspecialchars($anime['poster']) ?>"
-                            src="<?= $websiteUrl ?>/public/images/no_poster.jpg"
-                            alt="<?= htmlspecialchars($title) ?>">
-                        <a class="film-poster-ahref"
-                            href="/details/<?= htmlspecialchars($animeId) ?>"
-                            title="<?= htmlspecialchars($title) ?>">
+                             data-src="<?= htmlspecialchars($anime['poster'] ?? $websiteUrl . '/public/images/no_poster.jpg') ?>"
+                             src="<?= $websiteUrl ?>/public/images/no_poster.jpg"
+                             alt="<?= htmlspecialchars($title) ?>">
+                        <a class="film-poster-ahref" href="/details/<?= htmlspecialchars($animeId) ?>" title="<?= htmlspecialchars($title) ?>">
                             <i class="fas fa-play"></i>
                         </a>
                     </div>
                     <div class="film-detail">
                         <h3 class="film-name">
-                            <a href="/details/<?= htmlspecialchars($animeId) ?>"
-                               class="dynamic-name"
-                               data-en="<?= htmlspecialchars($title) ?>"
-                               data-jp="<?= htmlspecialchars($jname) ?>">
+                            <a href="/details/<?= htmlspecialchars($animeId) ?>" class="dynamic-name"
+                               data-en="<?= htmlspecialchars($title) ?>" data-jp="<?= htmlspecialchars($jname) ?>">
                                 <?= htmlspecialchars($title) ?>
                             </a>
                         </h3>
                         <div class="fd-infor">
-                            <?php if (!empty($anime['releaseDate'])): ?>
-                                <span class="fdi-item"><i class="fas fa-calendar-alt"></i> <?= htmlspecialchars($anime['releaseDate']) ?></span>
-                            <?php endif; ?>
-                            <span class="fdi-item"><?= htmlspecialchars($anime['tvInfo']['showType'] ?? 'TV' ?? '') ?></span>
+                            <span class="fdi-item"><?= htmlspecialchars($tvInfo['showType'] ?? (!empty($anime['season']) ? 'Season ' . $anime['season'] : 'TV')) ?></span>
                             <span class="dot"></span>
-                            <span class="fdi-item"><?= htmlspecialchars($anime['tvInfo']['duration'] ?? ($anime['run_time'] ?? 'N/A') ?? '') ?></span>
+                            <span class="fdi-item"><?= htmlspecialchars($tvInfo['duration'] ?? ($anime['run_time'] ?? 'N/A')) ?></span>
                         </div>
                     </div>
                     <div class="clearfix"></div>
                 </div>
-                <?php
-                    }
-                } else {
-                    echo "<p>No anime data available or invalid structure.</p>";
-                }
-                ?>
+                <?php endforeach; ?>
             </div>
             <div class="clearfix"></div>
         </div>
