@@ -1,0 +1,25 @@
+{
+  "functions": {
+    "**/*.php": {
+      "runtime": "vercel-php@0.7.2"
+    }
+  },
+  "routes": [
+    {
+      "src": "/public/(.*)",
+      "dest": "/public/$1"
+    },
+    {
+      "src": "/src/assets/(.*)",
+      "dest": "/src/assets/$1"
+    },
+    {
+      "src": "/(home|search|anime|login|register|watch)",
+      "dest": "/index.php"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.php"
+    }
+  ]
+}
