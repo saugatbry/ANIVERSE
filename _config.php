@@ -9,29 +9,27 @@ if ($conn->connect_error) {
     echo("Database connection failed.");
 }
 
-
-$websiteTitle = "Ani Verse";
+$websiteTitle = "AniPaca";
 $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https" : "http";
 $websiteUrl = "{$protocol}://{$_SERVER['SERVER_NAME']}";
 $websiteLogo = $websiteUrl . "/public/logo/logo.png";
-$contactEmail = "contact@aniverse.com";
+$contactEmail = "raisulentertainment@gmail.com";
 
-$version = "1.1.0";
+$version = "1.0.2";
 
-$discord = "https://discord.gg/aniverse";
-$github = "https://github.com/aniverse";
-$telegram = "https://t.me/aniverse";
-$instagram = "https://www.instagram.com/aniverse"; 
+$discord = "https://dcd.gg/anipaca";
+$github = "https://github.com/PacaHat";
+$telegram = "https://t.me/anipaca";
+$instagram = "https://www.instagram.com/pxr15_"; 
 
 // all the api you need
-$zpi = "https://anime-api-ashen-chi.vercel.app/api"; 
-$proxy = ""; // Removed proxy as requested
+$zpi = "https://your-hosted-api.com/api"; //https://github.com/PacaHat/zen-api
+$proxy = $websiteUrl . "/src/ajax/proxy.php?url=";
 
 //If you want faster loading speed just put // before the first proxy and remove slashes from this one 
-//$proxy = "https://your-hosted-proxy.com/proxy?url=";
+//$proxy = "https://your-hosted-proxy.com/proxy?url="; //https://github.com/PacaHat/shrina-proxy
 
 
 $banner = $websiteUrl . "/public/images/banner.png";
-
 
     

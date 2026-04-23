@@ -40,8 +40,6 @@ require_once($_SERVER['DOCUMENT_ROOT'] . '/_config.php');
     <link rel="manifest" href="./manifest.json">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="<?= $websiteUrl ?>/src/assets/css/styles.min.css?v=<?= $version ?>">
-    <link rel="stylesheet" href="<?= $websiteUrl ?>/src/assets/css/premium.css?v=<?= $version ?>">
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     <script type="text/javascript" src="https://platform-api.sharethis.com/js/sharethis.js#property=67521dcc10699f0019237fbb&product=inline-share-buttons&source=platform" async="async"></script>
 
      
@@ -122,9 +120,8 @@ require_once($_SERVER['DOCUMENT_ROOT'] . '/_config.php');
                         <div class="mwt-icon"><img src="https://anipaca.fun/public/images/waifu.gif" onerror="this.onerror=null; this.src='<?= $websiteUrl ?>/public/images/zorowaifu.png';">
                         </div>
                         <div class="mwh-logo">
-                            <a href="<?= $websiteUrl ?>/home" class="logo-container">
-                                <div class="logo-icon">A</div>
-                                <div class="logo-text">Ani Verse</div>
+                            <a href="<?= $websiteUrl ?>/home" class="mwh-logo-div">
+                                <img src="<?= $websiteLogo ?>" alt="<?= $websiteTitle ?>">
                             </a>
                             <div class="clearfix"></div>
                         </div>
