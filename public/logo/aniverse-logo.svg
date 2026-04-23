@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 120" role="img" aria-label="Ani Verse logo">
+  <defs>
+    <linearGradient id="avGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff5ca8"/>
+      <stop offset="100%" stop-color="#7b6cff"/>
+    </linearGradient>
+  </defs>
+  <rect width="420" height="120" rx="22" fill="#171a24"/>
+  <circle cx="62" cy="60" r="34" fill="url(#avGrad)"/>
+  <path d="M48 74l14-31 14 31h-8l-2.5-6h-7L56 74z" fill="#fff"/>
+  <path d="M59.5 61h4.9l-2.5-6.2z" fill="#171a24"/>
+  <text x="112" y="53" fill="#f3f5ff" font-size="34" font-family="Poppins,Segoe UI,Arial,sans-serif" font-weight="700">Ani Verse</text>
+  <text x="113" y="82" fill="#9ea6cf" font-size="15" font-family="Poppins,Segoe UI,Arial,sans-serif">Stream • Track • Discover</text>
+</svg>

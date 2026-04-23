@@ -14,14 +14,16 @@
             <div class="film_list-wrap">
                 <?php
                 // Fetch JSON data
-                $json = file_get_contents("$zpi/top-upcoming");
+                $json = file_get_contents("$zpi/series?page=1");
                 $json = json_decode($json, true);
 
                 // Check if 'results' and 'data' exist
-                if (isset($json['results']['data']) && is_array($json['results']['data'])) {
-                    $animeList = array_slice($json['results']['data'], 0, 12);
+                if (isset($json['results']) && is_array($json['results'])) {
+                    $animeList = $json['results']['data'] ?? $json['results'];
+                    if (isset($animeList['results']) && is_array($animeList['results'])) { $animeList = $animeList['results']; }
+                    $animeList = array_slice($animeList, 0, 12);
                     foreach ($animeList as $anime) {
-                        $title = !empty($anime['title']) ? $anime['title'] : 'Unknown';
+                        $title = !empty($anime['title'] ?? 'Unknown') ? $anime['title'] ?? 'Unknown' : 'Unknown';
                         $jname = !empty($anime['jname']) ? $anime['jname'] : $title;
                 ?>
                 <div class="flw-item">
@@ -51,14 +53,14 @@
                             src="<?= $websiteUrl ?>/public/images/no_poster.jpg"
                             alt="<?= htmlspecialchars($title) ?>">
                         <a class="film-poster-ahref"
-                            href="/details/<?= htmlspecialchars($anime['id']) ?>"
+                            href="/details/<?= htmlspecialchars(($anime['id'] ?? $anime['anime_id'] ?? '')) ?>"
                             title="<?= htmlspecialchars($title) ?>">
                             <i class="fas fa-play"></i>
                         </a>
                     </div>
                     <div class="film-detail">
                         <h3 class="film-name">
-                            <a href="/details/<?= htmlspecialchars($anime['id']) ?>"
+                            <a href="/details/<?= htmlspecialchars(($anime['id'] ?? $anime['anime_id'] ?? '')) ?>"
                                class="dynamic-name"
                                data-en="<?= htmlspecialchars($title) ?>"
                                data-jp="<?= htmlspecialchars($jname) ?>">
@@ -69,9 +71,9 @@
                             <?php if (!empty($anime['releaseDate'])): ?>
                                 <span class="fdi-item"><i class="fas fa-calendar-alt"></i> <?= htmlspecialchars($anime['releaseDate']) ?></span>
                             <?php endif; ?>
-                            <span class="fdi-item"><?= htmlspecialchars($anime['tvInfo']['showType'] ?? '') ?></span>
+                            <span class="fdi-item"><?= htmlspecialchars($anime['tvInfo']['showType'] ?? 'TV' ?? '') ?></span>
                             <span class="dot"></span>
-                            <span class="fdi-item"><?= htmlspecialchars($anime['tvInfo']['duration'] ?? '') ?></span>
+                            <span class="fdi-item"><?= htmlspecialchars($anime['tvInfo']['duration'] ?? ($anime['run_time'] ?? 'N/A') ?? '') ?></span>
                         </div>
                     </div>
                     <div class="clearfix"></div>

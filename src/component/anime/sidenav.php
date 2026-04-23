@@ -1,14 +1,24 @@
 <?php
-
-$apiUrl = $zpi . "/top-ten";
-$response = file_get_contents($apiUrl);
-$data = json_decode($response, true);
-
-if ($data['success']) {
-    $todayResults = $data['results']['today'];
-    $weekResults = $data['results']['week'];
-    $monthResults = $data['results']['month'];
+$apiUrl = $zpi . "/series?page=1";
+$response = @file_get_contents($apiUrl);
+$data = $response ? json_decode($response, true) : [];
+$items = [];
+if (!empty($data['success'])) {
+    $items = $data['results']['results'] ?? $data['results'] ?? [];
 }
+$todayResults = array_slice($items, 0, 10);
+$weekResults = array_slice($items, 10, 10);
+$monthResults = array_slice($items, 20, 10);
+foreach ([$todayResults, $weekResults, $monthResults] as &$bucket) {
+    foreach ($bucket as $i => &$anime) {
+        if (!isset($anime['number'])) $anime['number'] = $i + 1;
+        if (!isset($anime['id']) && isset($anime['anime_id'])) $anime['id'] = $anime['anime_id'];
+        if (!isset($anime['jname'])) $anime['jname'] = $anime['title'] ?? 'Unknown';
+        if (!isset($anime['tvInfo'])) $anime['tvInfo'] = [];
+    }
+}
+unset($bucket, $anime);
+$data = ['results' => ['today' => $todayResults, 'week' => $weekResults, 'month' => $monthResults]];
 ?>
 
 <div id="main-sidebar">
